@@ -21,7 +21,7 @@ class AppColors {
   static const Color border = Color(0xFFE2E8F0);
   static const Color divider = Color(0xFFF1F5F9);
 
-  // Category Colors (from GreenCart assets)
+  // Category Colors (from DailyMart assets)
   static const Color catVegetables = Color(0xFFFEF6DA);
   static const Color catFruits = Color(0xFFFEE0E0);
   static const Color catDrinks = Color(0xFFF0F5DE);

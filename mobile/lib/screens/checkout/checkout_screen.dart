@@ -289,24 +289,60 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 ),
                 child: Column(
                   children: [
-                    RadioListTile<String>(
-                      value: 'COD',
-                      groupValue: _paymentType,
-                      activeColor: AppColors.primary,
-                      title: const Text('Cash on Delivery (COD)', style: TextStyle(fontWeight: FontWeight.w600)),
-                      subtitle: const Text('Pay with cash or UPI upon delivery', style: TextStyle(fontSize: 12)),
-                      secondary: const Icon(Icons.money, color: AppColors.primary),
-                      onChanged: (val) => setState(() => _paymentType = val!),
+                    InkWell(
+                      onTap: () => setState(() => _paymentType = 'COD'),
+                      borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                        child: Row(
+                          children: [
+                            Icon(
+                              _paymentType == 'COD' ? Icons.radio_button_checked : Icons.radio_button_off,
+                              color: _paymentType == 'COD' ? AppColors.primary : AppColors.textMuted,
+                            ),
+                            const SizedBox(width: 12),
+                            const Icon(Icons.money, color: AppColors.primary),
+                            const SizedBox(width: 12),
+                            const Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text('Cash on Delivery (COD)', style: TextStyle(fontWeight: FontWeight.w600)),
+                                  Text('Pay with cash or UPI upon delivery', style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                     const Divider(height: 1),
-                    RadioListTile<String>(
-                      value: 'Online',
-                      groupValue: _paymentType,
-                      activeColor: AppColors.primary,
-                      title: const Text('Online Payment (Simulated)', style: TextStyle(fontWeight: FontWeight.w600)),
-                      subtitle: const Text('Instant simulated confirmation', style: TextStyle(fontSize: 12)),
-                      secondary: const Icon(Icons.payment, color: AppColors.primary),
-                      onChanged: (val) => setState(() => _paymentType = val!),
+                    InkWell(
+                      onTap: () => setState(() => _paymentType = 'Online'),
+                      borderRadius: const BorderRadius.vertical(bottom: Radius.circular(16)),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                        child: Row(
+                          children: [
+                            Icon(
+                              _paymentType == 'Online' ? Icons.radio_button_checked : Icons.radio_button_off,
+                              color: _paymentType == 'Online' ? AppColors.primary : AppColors.textMuted,
+                            ),
+                            const SizedBox(width: 12),
+                            const Icon(Icons.payment, color: AppColors.primary),
+                            const SizedBox(width: 12),
+                            const Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text('Online Payment (Simulated)', style: TextStyle(fontWeight: FontWeight.w600)),
+                                  Text('Instant simulated confirmation', style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ],
                 ),

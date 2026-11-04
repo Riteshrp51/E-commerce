@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
@@ -14,7 +15,8 @@ class ApiException implements Exception {
 }
 
 class ApiClient {
-  static const String tokenKey = 'greencart_jwt_token';
+  static const String tokenKey = 'dailymart_jwt_token';
+  static const Duration requestTimeout = Duration(seconds: 8);
 
   static Future<String?> getToken() async {
     final prefs = await SharedPreferences.getInstance();
@@ -75,10 +77,12 @@ class ApiClient {
       final headers = await _getHeaders(requireAuth: requireAuth);
       final response = await http
           .get(Uri.parse(url), headers: headers)
-          .timeout(const Duration(seconds: 15));
+          .timeout(requestTimeout);
       return _handleResponse(response);
     } on SocketException {
       throw ApiException('Cannot reach the server. Please check your network connection.');
+    } on TimeoutException {
+      throw ApiException('Connection timed out. Please ensure the backend server is running.');
     } on http.ClientException {
       throw ApiException('Network request failed.');
     } catch (e) {
@@ -96,10 +100,12 @@ class ApiClient {
             headers: headers,
             body: body != null ? jsonEncode(body) : null,
           )
-          .timeout(const Duration(seconds: 15));
+          .timeout(requestTimeout);
       return _handleResponse(response);
     } on SocketException {
       throw ApiException('Cannot reach the server. Please check your network connection.');
+    } on TimeoutException {
+      throw ApiException('Connection timed out. Please ensure the backend server is running.');
     } on http.ClientException {
       throw ApiException('Network request failed.');
     } catch (e) {
@@ -117,10 +123,12 @@ class ApiClient {
             headers: headers,
             body: body != null ? jsonEncode(body) : null,
           )
-          .timeout(const Duration(seconds: 15));
+          .timeout(requestTimeout);
       return _handleResponse(response);
     } on SocketException {
       throw ApiException('Cannot reach the server. Please check your network connection.');
+    } on TimeoutException {
+      throw ApiException('Connection timed out. Please ensure the backend server is running.');
     } on http.ClientException {
       throw ApiException('Network request failed.');
     } catch (e) {
@@ -134,10 +142,12 @@ class ApiClient {
       final headers = await _getHeaders(requireAuth: requireAuth);
       final response = await http
           .delete(Uri.parse(url), headers: headers)
-          .timeout(const Duration(seconds: 15));
+          .timeout(requestTimeout);
       return _handleResponse(response);
     } on SocketException {
       throw ApiException('Cannot reach the server. Please check your network connection.');
+    } on TimeoutException {
+      throw ApiException('Connection timed out. Please ensure the backend server is running.');
     } on http.ClientException {
       throw ApiException('Network request failed.');
     } catch (e) {
@@ -146,4 +156,3 @@ class ApiClient {
     }
   }
 }
-

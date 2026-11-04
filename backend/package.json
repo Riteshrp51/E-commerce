@@ -1,7 +1,7 @@
 {
-  "name": "greencart-backend",
+  "name": "dailymart-backend",
   "version": "1.0.0",
-  "description": "GreenCart E-commerce REST API backend built with Express, MongoDB, and Mongoose",
+  "description": "DailyMart E-commerce REST API backend built with Express, MongoDB, and Mongoose",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

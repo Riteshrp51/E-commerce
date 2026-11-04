@@ -9,11 +9,11 @@ import 'screens/splash/splash_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const GreenCartApp());
+  runApp(const DailyMartApp());
 }
 
-class GreenCartApp extends StatelessWidget {
-  const GreenCartApp({super.key});
+class DailyMartApp extends StatelessWidget {
+  const DailyMartApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +25,7 @@ class GreenCartApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => OrderProvider()),
       ],
       child: MaterialApp(
-        title: 'GreenCart',
+        title: 'DailyMart',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.lightTheme,
         home: const SplashScreen(),

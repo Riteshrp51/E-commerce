@@ -1,29 +1,58 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
+import 'package:http/http.dart' as http;
 
 class ApiConstants {
-  // Your PC's Wi-Fi IP address for physical Android devices
-  // (Or run 'adb reverse tcp:5000 tcp:5000' in cmd to use localhost)
-  static const String serverHost = '192.168.1.14';
+  // Candidate hosts for phone connection:
+  // 1. 127.0.0.1 (High-speed USB ADB reverse forwarding)
+  // 2. 192.168.1.14 (Local Wi-Fi IP of development PC)
+  // 3. 10.0.2.2 (Android Emulator host loopback)
+  static const List<String> candidateHosts = [
+    '127.0.0.1',
+    '192.168.1.14',
+    '10.0.2.2',
+  ];
   static const int serverPort = 5000;
+  static String? _cachedBaseUrl;
 
-  // Configurable base URL
-  static String get baseUrl {
-    if (kIsWeb) {
-      return 'http://localhost:$serverPort';
-    }
+  static String get defaultBaseUrl {
+    if (kIsWeb) return 'http://localhost:$serverPort';
     try {
-      if (Platform.isAndroid) {
-        // Physical phone or emulator on local Wi-Fi
-        return 'http://$serverHost:$serverPort';
-      }
+      if (Platform.isAndroid) return 'http://127.0.0.1:$serverPort';
     } catch (_) {}
     return 'http://localhost:$serverPort';
+  }
+
+  // Active base URL for all API requests
+  static String get baseUrl => _cachedBaseUrl ?? defaultBaseUrl;
+
+  // Quickly resolves which host is actively reachable (< 800ms)
+  static Future<String> resolveActiveBaseUrl() async {
+    if (_cachedBaseUrl != null) return _cachedBaseUrl!;
+
+    for (final host in candidateHosts) {
+      final testUrl = 'http://$host:$serverPort';
+      try {
+        final client = http.Client();
+        final uri = Uri.parse('$testUrl/api/products?limit=1');
+        final response = await client.get(uri).timeout(const Duration(milliseconds: 900));
+        client.close();
+        if (response.statusCode >= 200 && response.statusCode < 500) {
+          _cachedBaseUrl = testUrl;
+          debugPrint('[ApiClient] Connected successfully to: $testUrl');
+          return testUrl;
+        }
+      } catch (_) {}
+    }
+
+    _cachedBaseUrl = defaultBaseUrl;
+    return _cachedBaseUrl!;
   }
 
   // API Endpoints
   static String get authRegister => '$baseUrl/api/auth/register';
   static String get authLogin => '$baseUrl/api/auth/login';
+  static String get authLogout => '$baseUrl/api/auth/logout';
   static String get authMe => '$baseUrl/api/auth/me';
 
   static String get products => '$baseUrl/api/products';
@@ -49,4 +78,3 @@ class ApiConstants {
     return '$baseUrl$cleanPath';
   }
 }
-

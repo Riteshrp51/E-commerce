@@ -121,5 +121,27 @@ const logout = async (req, res, next) => {
   }
 };
 
-module.exports = { register, login, logout };
+// @desc    Get currently logged in user profile
+// @route   GET /api/auth/me
+// @access  Private (JWT required)
+const getMe = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User profile not found.',
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      user,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+module.exports = { register, login, logout, getMe };
 

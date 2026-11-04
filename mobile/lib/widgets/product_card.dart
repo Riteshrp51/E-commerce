@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../core/constants/api_constants.dart';
@@ -34,10 +35,10 @@ class ProductCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: AppColors.border.withOpacity(0.8)),
+          border: Border.all(color: AppColors.border.withValues(alpha: 0.8)),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.03),
+              color: Colors.black.withValues(alpha: 0.03),
               blurRadius: 6,
               offset: const Offset(0, 2),
             ),
@@ -51,27 +52,30 @@ class ProductCard extends StatelessWidget {
               children: [
                 ClipRRect(
                   borderRadius: const BorderRadius.vertical(top: Radius.circular(14)),
-                  child: Container(
-                    height: 105,
-                    width: double.infinity,
-                    color: AppColors.getCategoryColor(product.category).withOpacity(0.35),
-                    child: CachedNetworkImage(
-                      imageUrl: ApiConstants.resolveImageUrl(product.imageUrl),
-                      fit: BoxFit.contain,
-                      placeholder: (context, url) => const Center(
-                        child: SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        ),
-                      ),
-                      errorWidget: (context, url, error) => Image.asset(
-                        'assets/${product.imageUrl.split('/').last}',
+                  child: Hero(
+                    tag: 'product_image_${product.id}',
+                    child: Container(
+                      height: 105,
+                      width: double.infinity,
+                      color: AppColors.getCategoryColor(product.category).withValues(alpha: 0.35),
+                      child: CachedNetworkImage(
+                        imageUrl: ApiConstants.resolveImageUrl(product.imageUrl),
                         fit: BoxFit.contain,
-                        errorBuilder: (_, __, ___) => const Icon(
-                          Icons.shopping_basket_rounded,
-                          size: 36,
-                          color: AppColors.textMuted,
+                        placeholder: (context, url) => const Center(
+                          child: SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                        ),
+                        errorWidget: (context, url, error) => Image.asset(
+                          'assets/${product.imageUrl.split('/').last}',
+                          fit: BoxFit.contain,
+                          errorBuilder: (_, __, ___) => const Icon(
+                            Icons.shopping_basket_rounded,
+                            size: 36,
+                            color: AppColors.textMuted,
+                          ),
                         ),
                       ),
                     ),
@@ -196,6 +200,7 @@ class ProductCard extends StatelessWidget {
                             width: double.infinity,
                             child: ElevatedButton(
                               onPressed: () {
+                                HapticFeedback.lightImpact();
                                 cartProvider.addToCart(product, quantity: 1);
                                 AppToast.success(context, '${product.name} added to cart');
                               },
@@ -238,6 +243,7 @@ class ProductCard extends StatelessWidget {
                               children: [
                                 InkWell(
                                   onTap: () {
+                                    HapticFeedback.lightImpact();
                                     final willRemove = qty <= 1;
                                     cartProvider.updateQuantity(product.id, qty - 1);
                                     if (willRemove) {
@@ -259,7 +265,10 @@ class ProductCard extends StatelessWidget {
                                   ),
                                 ),
                                 InkWell(
-                                  onTap: () => cartProvider.updateQuantity(product.id, qty + 1),
+                                  onTap: () {
+                                    HapticFeedback.lightImpact();
+                                    cartProvider.updateQuantity(product.id, qty + 1);
+                                  },
                                   borderRadius: const BorderRadius.horizontal(right: Radius.circular(7)),
                                   child: const Padding(
                                     padding: EdgeInsets.symmetric(horizontal: 8, vertical: 5),

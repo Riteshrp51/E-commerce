@@ -20,36 +20,25 @@ for (const binPath of possibleMongoBinaries) {
 }
 
 const connectDB = async () => {
-  const uri = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/greencart';
+  const uri = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/dailymart';
   
   try {
-    // Attempt standard connection first with a fast timeout
-    console.log(`Connecting to MongoDB at: ${uri}...`);
     const conn = await mongoose.connect(uri, {
       serverSelectionTimeoutMS: 2500,
     });
     console.log(`MongoDB Connected successfully: ${conn.connection.host}`);
     return conn;
   } catch (primaryErr) {
-    console.warn(`Standard MongoDB connection to ${uri} failed: ${primaryErr.message}`);
-
     if (process.env.USE_MEMORY_DB_IF_LOCAL_FAILS === 'true' || process.env.NODE_ENV !== 'production') {
       try {
-        console.log('Spinning up embedded MongoDB Memory Server using local binary...');
         const { MongoMemoryServer } = require('mongodb-memory-server');
-        
         memoryServer = await MongoMemoryServer.create({
-          instance: {
-            dbName: 'greencart',
-          },
-          binary: {
-            systemBinary: process.env.MONGOMS_SYSTEM_BINARY,
-          },
+          instance: { dbName: 'dailymart' },
+          binary: { systemBinary: process.env.MONGOMS_SYSTEM_BINARY },
         });
         const memUri = memoryServer.getUri();
-        
         const conn = await mongoose.connect(memUri);
-        console.log(`Connected to in-memory MongoDB successfully at: ${memUri}`);
+        console.log(`MongoDB Connected successfully (In-Memory): ${conn.connection.host}`);
         return conn;
       } catch (memErr) {
         console.error(`Failed to launch in-memory MongoDB: ${memErr.message}`);

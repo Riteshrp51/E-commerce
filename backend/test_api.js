@@ -6,7 +6,7 @@ const { connectDB, disconnectDB } = require('./src/config/db');
 // Lightweight test runner using native Node.js fetch / http
 async function runTests() {
   console.log('\n======================================================');
-  console.log('   RUNNING GREENCART REST API AUTOMATED TEST SUITE    ');
+  console.log('   RUNNING DAILYMART REST API AUTOMATED TEST SUITE    ');
   console.log('======================================================\n');
 
   await connectDB();

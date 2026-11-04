@@ -402,28 +402,28 @@ const sampleProducts = [
 
 const seedData = async () => {
   try {
-    console.log('Seeding GreenCart database...');
+    console.log('Seeding DailyMart database...');
     await connectDB();
 
     // 1. Clean existing products and carts
     await Product.deleteMany({});
     console.log('Cleared existing product catalog.');
 
-    // 2. Insert GreenCart products
+    // 2. Insert DailyMart products
     const insertedProducts = await Product.insertMany(sampleProducts);
-    console.log(`Successfully seeded ${insertedProducts.length} GreenCart products across 7 categories.`);
+    console.log(`Successfully seeded ${insertedProducts.length} DailyMart products across 7 categories.`);
 
     // 3. Ensure a demo customer user exists
-    let demoUser = await User.findOne({ email: 'demo@greencart.com' });
+    let demoUser = await User.findOne({ email: 'demo@dailymart.com' });
     if (!demoUser) {
       const passwordHash = await User.hashPassword('password123');
       demoUser = await User.create({
         name: 'Demo Customer',
-        email: 'demo@greencart.com',
+        email: 'demo@dailymart.com',
         passwordHash,
         role: 'customer',
       });
-      console.log('Created demo user: demo@greencart.com (password: password123)');
+      console.log('Created demo user: demo@dailymart.com (password: password123)');
     }
 
     // Ensure cart exists for demo user

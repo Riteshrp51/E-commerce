@@ -50,7 +50,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
             return EmptyView(
               icon: Icons.receipt_long_outlined,
               title: 'No orders yet',
-              message: 'When you place orders on GreenCart, you will be able to track their progress here.',
+              message: 'When you place orders on DailyMart, you will be able to track their progress here.',
               buttonText: 'Start Shopping',
               onButtonPressed: () => Navigator.pop(context),
             );

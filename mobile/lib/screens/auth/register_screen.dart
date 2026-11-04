@@ -76,7 +76,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  'Join GreenCart',
+                  'Join DailyMart',
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../../core/constants/app_colors.dart';
 import '../../providers/auth_provider.dart';
@@ -55,7 +56,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
             const SizedBox(width: 8),
             Container(
               padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: AppColors.primaryLight,
                 shape: BoxShape.circle,
               ),
@@ -70,7 +71,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  'GreenCart',
+                  'DailyMart',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -169,7 +170,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                 authProvider.user?.name ?? 'Guest User',
                 style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
               ),
-              accountEmail: Text(authProvider.user?.email ?? 'demo@greencart.com'),
+              accountEmail: Text(authProvider.user?.email ?? 'demo@dailymart.com'),
             ),
             ListTile(
               leading: const Icon(Icons.storefront_outlined, color: AppColors.primary),
@@ -211,11 +212,10 @@ class _CatalogScreenState extends State<CatalogScreen> {
               leading: const Icon(Icons.logout_rounded, color: AppColors.error),
               title: const Text('Logout', style: TextStyle(color: AppColors.error)),
               onTap: () async {
+                final nav = Navigator.of(context);
                 await authProvider.logout();
                 cartProvider.clearLocalCart();
-                if (!mounted) return;
-                Navigator.pushAndRemoveUntil(
-                  context,
+                nav.pushAndRemoveUntil(
                   MaterialPageRoute(builder: (_) => const LoginScreen()),
                   (route) => false,
                 );
@@ -276,7 +276,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.06),
+                    color: Colors.black.withValues(alpha: 0.06),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
@@ -381,6 +381,108 @@ class _CatalogScreenState extends State<CatalogScreen> {
             ),
           ),
         ],
+      ),
+      bottomNavigationBar: Consumer<CartProvider>(
+        builder: (context, cart, _) {
+          if (cart.itemCount == 0) return const SizedBox.shrink();
+
+          return SafeArea(
+            child: Container(
+              margin: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              decoration: BoxDecoration(
+                color: AppColors.primary,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.primary.withValues(alpha: 0.35),
+                    blurRadius: 16,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // Item Count & Total
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.2),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.shopping_bag_outlined,
+                          color: Colors.white,
+                          size: 18,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            '${cart.itemCount} ${cart.itemCount == 1 ? "item" : "items"} in cart',
+                            style: const TextStyle(
+                              color: Colors.white70,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          Text(
+                            '₹${cart.total.toStringAsFixed(0)}',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+
+                  // View Cart Button
+                  InkWell(
+                    onTap: () {
+                      HapticFeedback.lightImpact();
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const CartScreen()),
+                      );
+                    },
+                    borderRadius: BorderRadius.circular(10),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'View Cart',
+                            style: TextStyle(
+                              color: AppColors.primary,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 13,
+                            ),
+                          ),
+                          SizedBox(width: 4),
+                          Icon(Icons.arrow_forward_rounded, color: AppColors.primary, size: 16),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
       ),
     );
   }

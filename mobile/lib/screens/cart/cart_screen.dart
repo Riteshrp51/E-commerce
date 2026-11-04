@@ -108,7 +108,7 @@ class _CartScreenState extends State<CartScreen> {
                             width: 64,
                             height: 64,
                             decoration: BoxDecoration(
-                              color: AppColors.getCategoryColor(item.category).withOpacity(0.5),
+                              color: AppColors.getCategoryColor(item.category).withValues(alpha: 0.5),
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: ClipRRect(
@@ -245,7 +245,7 @@ class _CartScreenState extends State<CartScreen> {
                   color: Colors.white,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.06),
+                      color: Colors.black.withValues(alpha: 0.06),
                       blurRadius: 10,
                       offset: const Offset(0, -3),
                     ),

@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../core/constants/api_constants.dart';
 import '../../core/constants/app_colors.dart';
 import '../../providers/auth_provider.dart';
-import '../../providers/cart_provider.dart';
-import '../../providers/product_provider.dart';
 import '../auth/login_screen.dart';
 import '../catalog/catalog_screen.dart';
 
@@ -18,21 +17,20 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    _bootstrap();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _bootstrap();
+    });
   }
 
   Future<void> _bootstrap() async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final productProvider = Provider.of<ProductProvider>(context, listen: false);
-    final cartProvider = Provider.of<CartProvider>(context, listen: false);
 
-    // Initial session verification & catalog preload
-    await authProvider.checkSession();
-    await productProvider.init();
-
-    if (authProvider.isAuthenticated) {
-      await cartProvider.fetchCart();
-    }
+    // Quick parallel bootstrap: resolve server host & verify session with minimal 700ms splash delay
+    await Future.wait([
+      ApiConstants.resolveActiveBaseUrl(),
+      authProvider.checkSession(),
+      Future.delayed(const Duration(milliseconds: 700)),
+    ]);
 
     if (!mounted) return;
 
@@ -52,7 +50,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.primary,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -60,43 +58,42 @@ class _SplashScreenState extends State<SplashScreen> {
             Container(
               width: 90,
               height: 90,
-              decoration: BoxDecoration(
-                color: AppColors.primaryLight,
+              decoration: const BoxDecoration(
+                color: Colors.white,
                 shape: BoxShape.circle,
-                border: Border.all(color: AppColors.primary, width: 2),
               ),
               child: const Icon(
                 Icons.shopping_basket_rounded,
-                size: 50,
+                size: 54,
                 color: AppColors.primary,
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
             const Text(
-              'GreenCart',
+              'DailyMart',
               style: TextStyle(
+                color: Colors.white,
                 fontSize: 32,
                 fontWeight: FontWeight.bold,
-                color: AppColors.primary,
                 letterSpacing: -0.5,
               ),
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 8),
             const Text(
-              'Organic Groceries Delivered Fast',
+              'Fresh Groceries Delivered Daily',
               style: TextStyle(
+                color: Colors.white70,
                 fontSize: 14,
-                color: AppColors.textSecondary,
                 fontWeight: FontWeight.w500,
               ),
             ),
             const SizedBox(height: 48),
             const SizedBox(
-              width: 28,
-              height: 28,
+              width: 24,
+              height: 24,
               child: CircularProgressIndicator(
-                color: AppColors.primary,
-                strokeWidth: 3,
+                strokeWidth: 2.5,
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
               ),
             ),
           ],
@@ -105,4 +102,3 @@ class _SplashScreenState extends State<SplashScreen> {
     );
   }
 }
-

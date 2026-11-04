@@ -99,7 +99,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 6),
                 const Center(
                   child: Text(
-                    'Sign in to your GreenCart account',
+                    'Sign in to your DailyMart account',
                     style: TextStyle(
                       fontSize: 14,
                       color: AppColors.textSecondary,

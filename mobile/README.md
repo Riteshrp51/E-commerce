@@ -1,6 +1,6 @@
-# GreenCart Flutter Mobile Application
+# DailyMart Flutter Mobile Application
 
-A shopping mobile application built with **Flutter**, designed to connect to the **GreenCart Node.js/Express REST API backend**.
+A shopping mobile application built with **Flutter**, designed to connect to the **DailyMart Node.js/Express REST API backend**.
 
 ---
 
@@ -14,7 +14,7 @@ A shopping mobile application built with **Flutter**, designed to connect to the
    - Quick-fill demo account button for instant assessment testing.
 
 2. **Product Catalogue & Details**:
-   - 34 GreenCart organic grocery products across 7 categories.
+   - 34 DailyMart organic grocery products across 7 categories.
    - Live search bar with instant keyword filtering.
    - Horizontal category filter chips (`Vegetables`, `Fruits`, `Drinks`, `Instant`, `Dairy`, `Bakery`, `Grains`).
    - Responsive 2-column product grid with discount badges, price calculation, and quick "+ Add" action.
@@ -50,7 +50,7 @@ A shopping mobile application built with **Flutter**, designed to connect to the
 
 ```
 mobile/
-├── assets/                     # Local GreenCart grocery assets & images
+├── assets/                     # Local DailyMart grocery assets & images
 ├── lib/
 │   ├── core/
 │   │   ├── constants/          # API endpoints, platform base URLs, colors
@@ -109,7 +109,7 @@ flutter pub get
 ---
 
 ## Default Demo Credentials
-- **Email**: `demo@greencart.com`
+- **Email**: `demo@dailymart.com`
 - **Password**: `password123`
 *(A "Quick Fill Demo Account" button is also provided on the Login screen)*.
 

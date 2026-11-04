@@ -186,7 +186,7 @@ class OrderDetailsScreen extends StatelessWidget {
                             width: 50,
                             height: 50,
                             decoration: BoxDecoration(
-                              color: AppColors.primaryLight.withOpacity(0.4),
+                              color: AppColors.primaryLight.withValues(alpha: 0.4),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: ClipRRect(
@@ -284,8 +284,8 @@ class OrderDetailsScreen extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                         decoration: BoxDecoration(
                           color: order.isPaid
-                              ? AppColors.success.withOpacity(0.12)
-                              : AppColors.warning.withOpacity(0.12),
+                              ? AppColors.success.withValues(alpha: 0.12)
+                              : AppColors.warning.withValues(alpha: 0.12),
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Text(

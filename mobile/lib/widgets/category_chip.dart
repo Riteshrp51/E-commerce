@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../core/constants/app_colors.dart';
 
 class CategoryChip extends StatelessWidget {
@@ -18,7 +19,10 @@ class CategoryChip extends StatelessWidget {
     final catColor = AppColors.getCategoryColor(label);
 
     return GestureDetector(
-      onTap: onTap,
+      onTap: () {
+        HapticFeedback.selectionClick();
+        onTap();
+      },
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -33,7 +37,7 @@ class CategoryChip extends StatelessWidget {
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: AppColors.primary.withOpacity(0.25),
+                    color: AppColors.primary.withValues(alpha: 0.25),
                     blurRadius: 6,
                     offset: const Offset(0, 2),
                   ),

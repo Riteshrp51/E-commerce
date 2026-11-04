@@ -84,25 +84,28 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
             Container(
               height: 280,
               width: double.infinity,
-              color: AppColors.getCategoryColor(product.category).withOpacity(0.3),
+              color: AppColors.getCategoryColor(product.category).withValues(alpha: 0.3),
               child: Stack(
                 alignment: Alignment.center,
                 children: [
-                  CachedNetworkImage(
-                    imageUrl: ApiConstants.resolveImageUrl(
-                      displayImages[_selectedImageIndex],
-                    ),
-                    fit: BoxFit.contain,
-                    placeholder: (_, __) => const Center(
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    ),
-                    errorWidget: (_, __, ___) => Image.asset(
-                      'assets/${displayImages[_selectedImageIndex].split('/').last}',
+                  Hero(
+                    tag: 'product_image_${product.id}',
+                    child: CachedNetworkImage(
+                      imageUrl: ApiConstants.resolveImageUrl(
+                        displayImages[_selectedImageIndex],
+                      ),
                       fit: BoxFit.contain,
-                      errorBuilder: (_, __, ___) => const Icon(
-                        Icons.shopping_basket_outlined,
-                        size: 80,
-                        color: AppColors.textMuted,
+                      placeholder: (_, __) => const Center(
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
+                      errorWidget: (_, __, ___) => Image.asset(
+                        'assets/${displayImages[_selectedImageIndex].split('/').last}',
+                        fit: BoxFit.contain,
+                        errorBuilder: (_, __, ___) => const Icon(
+                          Icons.shopping_basket_outlined,
+                          size: 80,
+                          color: AppColors.textMuted,
+                        ),
                       ),
                     ),
                   ),
@@ -176,8 +179,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
                           color: product.inStock
-                              ? AppColors.success.withOpacity(0.12)
-                              : AppColors.error.withOpacity(0.12),
+                              ? AppColors.success.withValues(alpha: 0.12)
+                              : AppColors.error.withValues(alpha: 0.12),
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
@@ -258,7 +261,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   ),
                   const SizedBox(height: 24),
 
-                  // GreenCart Trust Badges
+                  // DailyMart Trust Badges
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
@@ -303,7 +306,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
           color: Colors.white,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.08),
+              color: Colors.black.withValues(alpha: 0.08),
               blurRadius: 10,
               offset: const Offset(0, -4),
             ),
@@ -365,7 +368,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                             product,
                             quantity: _selectedQuantity,
                           );
-                          if (!mounted) return;
+                          if (!context.mounted) return;
                           if (ok) {
                             AppToast.success(
                               context,
