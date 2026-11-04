@@ -258,32 +258,7 @@ async function runTests() {
       if (json.data.items.length === 0) throw new Error('No items in order snapshot');
     });
 
-    // 19. Check order status (GET)
-    await test('GET /api/orders/:id/status - Fetch order status directly', async () => {
-      const res = await fetch(`${baseUrl}/api/orders/${testOrderId}/status`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (res.status !== 200) throw new Error(`Status ${res.status}`);
-      const json = await res.json();
-      if (json.status !== 'Pending') throw new Error(`Expected Pending, got ${json.status}`);
-    });
-
-    // 20. Update order status (supports lowercase 'shipped')
-    await test('PATCH /api/orders/:id/status - Update order status to Shipped', async () => {
-      const res = await fetch(`${baseUrl}/api/orders/${testOrderId}/status`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ status: 'shipped' }),
-      });
-      if (res.status !== 200) throw new Error(`Status ${res.status}`);
-      const json = await res.json();
-      if (json.status !== 'Shipped') throw new Error(`Expected Shipped, got ${json.status}`);
-    });
-
-  } finally {
+    } finally {
     server.close();
     await disconnectDB();
   }

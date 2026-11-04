@@ -13,7 +13,6 @@ class ApiConstants {
   static const List<String> candidateHosts = [
     '127.0.0.1',
     '172.16.20.148',
-    '10.71.196.29',
     '10.0.2.2',
   ];
   static const int serverPort = 5000;
@@ -36,7 +35,7 @@ class ApiConstants {
       final uri = Uri.parse('$cleanUrl/api/products?limit=1');
       final response = await client
           .get(uri)
-          .timeout(const Duration(milliseconds: 1500));
+          .timeout(const Duration(milliseconds: 2500));
       client.close();
       return response.statusCode >= 200 && response.statusCode < 500;
     } catch (_) {
@@ -47,7 +46,8 @@ class ApiConstants {
   // Test and save custom server address
   static Future<bool> testAndSaveHost(String hostOrUrl) async {
     String formattedUrl = hostOrUrl.trim().replaceAll(RegExp(r'/+$'), '');
-    if (!formattedUrl.startsWith('http://') && !formattedUrl.startsWith('https://')) {
+    if (!formattedUrl.startsWith('http://') &&
+        !formattedUrl.startsWith('https://')) {
       if (!formattedUrl.contains(':')) {
         formattedUrl = 'http://$formattedUrl:$serverPort';
       } else {
@@ -68,7 +68,8 @@ class ApiConstants {
   }
 
   // Quickly resolves which host is actively reachable
-  static Future<String> resolveActiveBaseUrl({bool forceRefresh = false}) async {
+  static Future<String> resolveActiveBaseUrl(
+      {bool forceRefresh = false}) async {
     if (!forceRefresh && _cachedBaseUrl != null) {
       return _cachedBaseUrl!;
     }
@@ -89,7 +90,8 @@ class ApiConstants {
 
     // 2. Probe candidate hosts starting with 127.0.0.1 (USB)
     for (final host in candidateHosts) {
-      final testUrl = host.startsWith('http') ? host : 'http://$host:$serverPort';
+      final testUrl =
+          host.startsWith('http') ? host : 'http://$host:$serverPort';
       final ok = await probeUrl(testUrl);
       if (ok) {
         _cachedBaseUrl = testUrl;
@@ -118,19 +120,21 @@ class ApiConstants {
 
   static String get orders => '$baseUrl/api/orders';
   static String orderDetails(String id) => '$baseUrl/api/orders/$id';
-  static String orderStatus(String id) => '$baseUrl/api/orders/$id/status';
 
   // Construct absolute image URL
-  static String resolveImageUrl(String? relativePath) => getImageUrl(relativePath);
+  static String resolveImageUrl(String? relativePath) =>
+      getImageUrl(relativePath);
 
   static String getImageUrl(String? relativePath) {
     if (relativePath == null || relativePath.isEmpty) {
       return '';
     }
-    if (relativePath.startsWith('http://') || relativePath.startsWith('https://')) {
+    if (relativePath.startsWith('http://') ||
+        relativePath.startsWith('https://')) {
       return relativePath;
     }
-    final cleanPath = relativePath.startsWith('/') ? relativePath : '/$relativePath';
+    final cleanPath =
+        relativePath.startsWith('/') ? relativePath : '/$relativePath';
     return '$baseUrl$cleanPath';
   }
 }

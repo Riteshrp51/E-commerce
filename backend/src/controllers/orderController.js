@@ -192,81 +192,8 @@ const getOrderById = async (req, res, next) => {
   }
 };
 
-// @desc    Get order status
-// @route   GET /api/orders/:id/status
-// @access  Private
-  const getOrderStatus = async (req, res, next) => {
-    try {
-      const order = await Order.findById(req.params.id);
-
-          if(!order) {
-            return res.status(404).json({
-              success: false,
-              message: `Order with ID '${req.params.id}' not found.`,
-            });
-          }
-
-    res.status(200).json({
-            success: true,
-            status: order.status || 'Pending',
-            orderId: order._id,
-            data: order,
-          });
-        } catch (err) {
-          next(err);
-        }
-      };
-
-      // @desc    Update order status (Supports Pending, Processing, Shipped, Delivered)
-      // @route   PATCH /api/orders/:id/status or POST /api/orders/:id/status
-      // @access  Private
-      const updateOrderStatus = async (req, res, next) => {
-        try {
-          const validStatuses = ['Pending', 'Processing', 'Shipped', 'Delivered'];
-          const order = await Order.findById(req.params.id);
-
-          if (!order) {
-            return res.status(404).json({
-              success: false,
-              message: `Order with ID '${req.params.id}' not found.`,
-            });
-          }
-
-          let targetStatus = order.status || 'Pending';
-          const rawStatus = req.body && req.body.status;
-
-          if (rawStatus && typeof rawStatus === 'string' && rawStatus.trim() !== '') {
-            const trimmed = rawStatus.trim();
-            const normalized = trimmed.charAt(0).toUpperCase() + trimmed.slice(1).toLowerCase();
-
-            if (validStatuses.includes(normalized)) {
-              targetStatus = normalized;
-            } else {
-              return res.status(400).json({
-                success: false,
-                message: `Invalid status. Must be one of: ${validStatuses.join(', ')}`,
-              });
-            }
-          }
-
-          order.status = targetStatus;
-          await order.save();
-
-          res.status(200).json({
-            success: true,
-            status: order.status,
-            message: `Order status is '${order.status}'`,
-            data: order,
-          });
-        } catch (err) {
-          next(err);
-        }
-      };
-
-      module.exports = {
-        createOrder,
-        getUserOrders,
-        getOrderById,
-        getOrderStatus,
-        updateOrderStatus,
-      };
+module.exports = {
+  createOrder,
+  getUserOrders,
+  getOrderById,
+};
