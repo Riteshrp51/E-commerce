@@ -1,25 +1,70 @@
 {
   "info": {
     "_postman_id": "31aa5cdc-4811-45b7-91f8-fd0557f06459",
-    "name": "E-commerce",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "47102475"
+    "name": "DailyMart E-commerce",
+    "description": "Comprehensive, fully automated Postman collection for the DailyMart REST API. Automatically captures and stores JWT token upon Login/Register, dynamically captures active product IDs and order IDs, and covers all Auth, Products, Cart, and Order endpoints.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "productId",
+      "value": "6aeac48feb714637bdeef491",
+      "type": "string"
+    },
+    {
+      "key": "orderId",
+      "value": "",
+      "type": "string"
+    }
+  ],
   "item": [
     {
       "name": "Authentication",
+      "description": "User registration, login, profile retrieval, and logout endpoints.",
       "item": [
         {
           "name": "Register User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201 || pm.response.code === 200) {",
+                  "    var json = pm.response.json();",
+                  "    if (json.token) {",
+                  "        pm.collectionVariables.set('token', json.token);",
+                  "        console.log('Saved token to collection variables');",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "auth": {
               "type": "noauth"
             },
             "method": "POST",
-            "header": [],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"name\": \"Ritesh\",\r\n    \"email\": \"riteshpatilrp51@gmail.com\",\r\n    \"password\": \"123456\"\r\n}",
+              "raw": "{\n  \"name\": \"Ritesh Patil\",\n  \"email\": \"riteshpatilrp51@gmail.com\",\n  \"password\": \"password123\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -27,12 +72,10 @@
               }
             },
             "url": {
-              "raw": "http://localhost:5000/api/auth/register",
-              "protocol": "http",
+              "raw": "{{baseUrl}}/api/auth/register",
               "host": [
-                "localhost"
+                "{{baseUrl}}"
               ],
-              "port": "5000",
               "path": [
                 "api",
                 "auth",
@@ -43,16 +86,38 @@
           "response": []
         },
         {
-          "name": "Login user",
+          "name": "Login User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var json = pm.response.json();",
+                  "    if (json.token) {",
+                  "        pm.collectionVariables.set('token', json.token);",
+                  "        console.log('Saved token to collection variables');",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "auth": {
               "type": "noauth"
             },
             "method": "POST",
-            "header": [],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"email\": \"riteshpatilrp51@gmail.com\",\r\n    \"password\": \"123456\"\r\n}",
+              "raw": "{\n  \"email\": \"demo@dailymart.com\",\n  \"password\": \"password123\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -60,16 +125,82 @@
               }
             },
             "url": {
-              "raw": "http://localhost:5000/api/auth/login",
-              "protocol": "http",
+              "raw": "{{baseUrl}}/api/auth/login",
               "host": [
-                "localhost"
+                "{{baseUrl}}"
               ],
-              "port": "5000",
               "path": [
                 "api",
                 "auth",
                 "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get User Profile (Me)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "me"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Logout User",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/logout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "logout"
               ]
             }
           },
@@ -79,18 +210,217 @@
     },
     {
       "name": "Products",
+      "description": "Catalog endpoints for browsing products, categories, search, filtering, and individual details.",
       "item": [
         {
           "name": "Products Listing",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var json = pm.response.json();",
+                  "    if (json.data && json.data.length > 0) {",
+                  "        pm.collectionVariables.set('productId', json.data[0]._id);",
+                  "        console.log('Saved active productId:', json.data[0]._id);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "auth": {
-              "type": "bearer"
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/products?page=1&limit=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "products"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Search & Filter Products",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/products?category=Vegetables&search=potato",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "products"
+              ],
+              "query": [
+                {
+                  "key": "category",
+                  "value": "Vegetables"
+                },
+                {
+                  "key": "search",
+                  "value": "potato"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Categories",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/products/categories",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "products",
+                "categories"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Product By Id",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/products/{{productId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "products",
+                "{{productId}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Cart Items",
+      "description": "User cart endpoints: get cart, add item, update quantity, remove item, clear cart.",
+      "item": [
+        {
+          "name": "Get Cart Items",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/cart",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "cart"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Add to Cart",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "POST",
-            "header": [],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"productId\":\"6ae9e00c2d174d2048fdfb2c\",\r\n    \"quantity\":2\r\n}",
+              "raw": "{\n  \"productId\": \"{{productId}}\",\n  \"quantity\": 2\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -98,12 +428,10 @@
               }
             },
             "url": {
-              "raw": "http://localhost:5000/api/cart/items",
-              "protocol": "http",
+              "raw": "{{baseUrl}}/api/cart/items",
               "host": [
-                "localhost"
+                "{{baseUrl}}"
               ],
-              "port": "5000",
               "path": [
                 "api",
                 "cart",
@@ -114,61 +442,32 @@
           "response": []
         },
         {
-          "name": "Products Listing",
-          "protocolProfileBehavior": {
-            "disableBodyPruning": true
-          },
-          "request": {
-            "auth": {
-              "type": "noauth"
-            },
-            "method": "GET",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "{\r\n    \"email\": \"riteshpatilrp51@gmail.com\",\r\n    \"password\": \"123456\"\r\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "http://localhost:5000/api/products",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "5000",
-              "path": [
-                "api",
-                "products"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Get Product By Id",
-          "protocolProfileBehavior": {
-            "disableBodyPruning": true
-          },
+          "name": "Update Cart Quantity",
           "request": {
             "auth": {
               "type": "bearer",
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhZTllMTMyMDRmMWZkZWM4MTI5MDBhOCIsInJvbGUiOiJjdXN0b21lciIsImVtYWlsIjoicml0ZXNocGF0aWxycDUxNTFAZ21haWwuY29tIiwiaWF0IjoxNzkzNzUzMzAyLCJleHAiOjE3OTQzNTgxMDJ9.nYXMsr2BPE-34A-KGJhHkmEjDeIidg6THMrl3Wo76Rw",
+                  "value": "{{token}}",
                   "type": "string"
                 }
               ]
             },
-            "method": "GET",
-            "header": [],
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"productId\":\"6ae9e00c2d174d2048fdfb2c\",\r\n    \"quantity\":2\r\n}",
+              "raw": "{\n  \"quantity\": 3\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -176,16 +475,83 @@
               }
             },
             "url": {
-              "raw": "http://localhost:5000/api/products/6ae9e00c2d174d2048fdfb2c",
-              "protocol": "http",
+              "raw": "{{baseUrl}}/api/cart/items/{{productId}}",
               "host": [
-                "localhost"
+                "{{baseUrl}}"
               ],
-              "port": "5000",
               "path": [
                 "api",
-                "products",
-                "6ae9e00c2d174d2048fdfb2c"
+                "cart",
+                "items",
+                "{{productId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Remove Cart Item",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/cart/items/{{productId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "cart",
+                "items",
+                "{{productId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Clear Entire Cart",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/cart",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "cart"
               ]
             }
           },
@@ -195,25 +561,52 @@
     },
     {
       "name": "Orders",
+      "description": "Order placement, order history, details by ID, and status checking/updates.",
       "item": [
         {
-          "name": "Place Order",
+          "name": "Place Order (from Cart)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201 || pm.response.code === 200) {",
+                  "    var json = pm.response.json();",
+                  "    if (json.data && json.data._id) {",
+                  "        pm.collectionVariables.set('orderId', json.data._id);",
+                  "        console.log('Saved orderId:', json.data._id);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "auth": {
               "type": "bearer",
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhZTllMTMyMDRmMWZkZWM4MTI5MDBhOCIsInJvbGUiOiJjdXN0b21lciIsImVtYWlsIjoicml0ZXNocGF0aWxycDUxNTFAZ21haWwuY29tIiwiaWF0IjoxNzkzNzUzMzAyLCJleHAiOjE3OTQzNTgxMDJ9.nYXMsr2BPE-34A-KGJhHkmEjDeIidg6THMrl3Wo76Rw",
+                  "value": "{{token}}",
                   "type": "string"
                 }
               ]
             },
             "method": "POST",
-            "header": [],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n  \"deliveryAddress\": {\r\n    \"fullName\": \"Ritesh Patil\",\r\n    \"phone\": \"9371245151\",\r\n    \"street\": \"38/1/B, R K Nagar, Pachgaon\",\r\n    \"city\": \"Kolhapur\",\r\n    \"state\": \"Maharshtra\",\r\n    \"postalCode\": \"416013\"\r\n  },\r\n  \"paymentType\": \"Online\"\r\n}",
+              "raw": "{\n  \"deliveryAddress\": {\n    \"fullName\": \"Ritesh Patil\",\n    \"phone\": \"9371245151\",\n    \"street\": \"38/1/B, R K Nagar, Pachgaon\",\n    \"city\": \"Kolhapur\",\n    \"state\": \"Maharashtra\",\n    \"postalCode\": \"416013\"\n  },\n  \"paymentType\": \"COD\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -221,12 +614,106 @@
               }
             },
             "url": {
-              "raw": "http://localhost:5000/api/orders",
-              "protocol": "http",
+              "raw": "{{baseUrl}}/api/orders",
               "host": [
-                "localhost"
+                "{{baseUrl}}"
               ],
-              "port": "5000",
+              "path": [
+                "api",
+                "orders"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Place Order (Direct Items)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201 || pm.response.code === 200) {",
+                  "    var json = pm.response.json();",
+                  "    if (json.data && json.data._id) {",
+                  "        pm.collectionVariables.set('orderId', json.data._id);",
+                  "        console.log('Saved orderId:', json.data._id);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    {\n      \"productId\": \"{{productId}}\",\n      \"quantity\": 1\n    }\n  ],\n  \"deliveryAddress\": {\n    \"fullName\": \"Ritesh Patil\",\n    \"phone\": \"9371245151\",\n    \"street\": \"38/1/B, R K Nagar, Pachgaon\",\n    \"city\": \"Kolhapur\",\n    \"state\": \"Maharashtra\",\n    \"postalCode\": \"416013\"\n  },\n  \"paymentType\": \"Online\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "orders"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Order History",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
               "path": [
                 "api",
                 "orders"
@@ -237,85 +724,33 @@
         },
         {
           "name": "Get Order Details",
-          "protocolProfileBehavior": {
-            "disableBodyPruning": true
-          },
           "request": {
             "auth": {
               "type": "bearer",
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhZTllMTMyMDRmMWZkZWM4MTI5MDBhOCIsInJvbGUiOiJjdXN0b21lciIsImVtYWlsIjoicml0ZXNocGF0aWxycDUxNTFAZ21haWwuY29tIiwiaWF0IjoxNzkzNzUzMzAyLCJleHAiOjE3OTQzNTgxMDJ9.nYXMsr2BPE-34A-KGJhHkmEjDeIidg6THMrl3Wo76Rw",
+                  "value": "{{token}}",
                   "type": "string"
                 }
               ]
             },
             "method": "GET",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "{\r\n  \"deliveryAddress\": {\r\n    \"fullName\": \"Ritesh Patil\",\r\n    \"phone\": \"9371245151\",\r\n    \"street\": \"38/1/B, R K Nagar, Pachgaon\",\r\n    \"city\": \"Kolhapur\",\r\n    \"state\": \"Maharshtra\",\r\n    \"postalCode\": \"416013\"\r\n  },\r\n  \"paymentType\": \"Online\"\r\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
               }
-            },
+            ],
             "url": {
-              "raw": "http://localhost:5000/api/orders/6aea83413f3587a00225ff6c",
-              "protocol": "http",
+              "raw": "{{baseUrl}}/api/orders/{{orderId}}",
               "host": [
-                "localhost"
+                "{{baseUrl}}"
               ],
-              "port": "5000",
               "path": [
                 "api",
                 "orders",
-                "6aea83413f3587a00225ff6c"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Get Order History",
-          "protocolProfileBehavior": {
-            "disableBodyPruning": true
-          },
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhZTllMTMyMDRmMWZkZWM4MTI5MDBhOCIsInJvbGUiOiJjdXN0b21lciIsImVtYWlsIjoicml0ZXNocGF0aWxycDUxNTFAZ21haWwuY29tIiwiaWF0IjoxNzkzNzUzMzAyLCJleHAiOjE3OTQzNTgxMDJ9.nYXMsr2BPE-34A-KGJhHkmEjDeIidg6THMrl3Wo76Rw",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "GET",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "{\r\n  \"deliveryAddress\": {\r\n    \"fullName\": \"Ritesh Patil\",\r\n    \"phone\": \"9371245151\",\r\n    \"street\": \"38/1/B, R K Nagar, Pachgaon\",\r\n    \"city\": \"Kolhapur\",\r\n    \"state\": \"Maharshtra\",\r\n    \"postalCode\": \"416013\"\r\n  },\r\n  \"paymentType\": \"Online\"\r\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "http://localhost:5000/api/orders/",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "5000",
-              "path": [
-                "api",
-                "orders",
-                ""
+                "{{orderId}}"
               ]
             }
           },
@@ -324,19 +759,32 @@
         {
           "name": "Get Order Status",
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "GET",
-            "header": [],
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
             "url": {
-              "raw": "http://localhost:5000/api/orders/6aea83413f3587a00225ff6c/status",
-              "protocol": "http",
+              "raw": "{{baseUrl}}/api/orders/{{orderId}}/status",
               "host": [
-                "localhost"
+                "{{baseUrl}}"
               ],
-              "port": "5000",
               "path": [
                 "api",
                 "orders",
-                "6aea83413f3587a00225ff6c",
+                "{{orderId}}",
                 "status"
               ]
             }
@@ -346,17 +794,30 @@
         {
           "name": "Update Order Status",
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "PATCH",
             "header": [
               {
                 "key": "Content-Type",
-                "value": "application/json",
-                "type": "text"
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
               }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"status\": \"Pending\"\n}",
+              "raw": "{\n  \"status\": \"Shipped\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -364,185 +825,15 @@
               }
             },
             "url": {
-              "raw": "http://localhost:5000/api/orders/6aea83413f3587a00225ff6c/status",
-              "protocol": "http",
+              "raw": "{{baseUrl}}/api/orders/{{orderId}}/status",
               "host": [
-                "localhost"
+                "{{baseUrl}}"
               ],
-              "port": "5000",
               "path": [
                 "api",
                 "orders",
-                "6aea83413f3587a00225ff6c",
+                "{{orderId}}",
                 "status"
-              ]
-            }
-          },
-          "response": []
-        }
-      ]
-    },
-    {
-      "name": "Cart Items",
-      "item": [
-        {
-          "name": "Add to Cart",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhZTllMTMyMDRmMWZkZWM4MTI5MDBhOCIsInJvbGUiOiJjdXN0b21lciIsImVtYWlsIjoicml0ZXNocGF0aWxycDUxNTFAZ21haWwuY29tIiwiaWF0IjoxNzkzNzUzMzAyLCJleHAiOjE3OTQzNTgxMDJ9.nYXMsr2BPE-34A-KGJhHkmEjDeIidg6THMrl3Wo76Rw",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "{\r\n    \"productId\":\"6ae9e00c2d174d2048fdfb2c\",\r\n    \"quantity\":2\r\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "http://localhost:5000/api/cart/items",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "5000",
-              "path": [
-                "api",
-                "cart",
-                "items"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Update Cart Quanity",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhZTllMTMyMDRmMWZkZWM4MTI5MDBhOCIsInJvbGUiOiJjdXN0b21lciIsImVtYWlsIjoicml0ZXNocGF0aWxycDUxNTFAZ21haWwuY29tIiwiaWF0IjoxNzkzNzUzMzAyLCJleHAiOjE3OTQzNTgxMDJ9.nYXMsr2BPE-34A-KGJhHkmEjDeIidg6THMrl3Wo76Rw",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "{\r\n  \"deliveryAddress\": {\r\n    \"fullName\": \"Ritesh Patil\",\r\n    \"phone\": \"9371245151\",\r\n    \"street\": \"38/1/B, R K Nagar, Pachgaon\",\r\n    \"city\": \"Kolhapur\",\r\n    \"state\": \"Maharshtra\",\r\n    \"postalCode\": \"416013\"\r\n  },\r\n  \"paymentType\": \"Online\"\r\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "http://localhost:5000/api/orders",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "5000",
-              "path": [
-                "api",
-                "orders"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Get Cart Items",
-          "protocolProfileBehavior": {
-            "disableBodyPruning": true
-          },
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhZTllMTMyMDRmMWZkZWM4MTI5MDBhOCIsInJvbGUiOiJjdXN0b21lciIsImVtYWlsIjoicml0ZXNocGF0aWxycDUxNTFAZ21haWwuY29tIiwiaWF0IjoxNzkzNzUzMzAyLCJleHAiOjE3OTQzNTgxMDJ9.nYXMsr2BPE-34A-KGJhHkmEjDeIidg6THMrl3Wo76Rw",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "GET",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "{\r\n    \"quantity\":4\r\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "http://localhost:5000/api/cart/",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "5000",
-              "path": [
-                "api",
-                "cart",
-                ""
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Delete Cart Items",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhZTllMTMyMDRmMWZkZWM4MTI5MDBhOCIsInJvbGUiOiJjdXN0b21lciIsImVtYWlsIjoicml0ZXNocGF0aWxycDUxNTFAZ21haWwuY29tIiwiaWF0IjoxNzkzNzUzMzAyLCJleHAiOjE3OTQzNTgxMDJ9.nYXMsr2BPE-34A-KGJhHkmEjDeIidg6THMrl3Wo76Rw",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "DELETE",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "http://localhost:5000/api/cart/items/6ae9e00c2d174d2048fdfb2c",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "5000",
-              "path": [
-                "api",
-                "cart",
-                "items",
-                "6ae9e00c2d174d2048fdfb2c"
               ]
             }
           },
