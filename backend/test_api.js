@@ -11,6 +11,13 @@ async function runTests() {
 
   await connectDB();
 
+  const Product = require('./src/models/Product');
+  const { sampleProducts } = require('./src/seeders/seedProducts');
+  const pCount = await Product.countDocuments();
+  if (pCount === 0) {
+    await Product.insertMany(sampleProducts);
+  }
+
   const server = http.createServer(app);
   await new Promise((resolve) => server.listen(5001, resolve));
   const baseUrl = 'http://127.0.0.1:5001';
@@ -251,7 +258,17 @@ async function runTests() {
       if (json.data.items.length === 0) throw new Error('No items in order snapshot');
     });
 
-    // 19. Update order status
+    // 19. Check order status (GET)
+    await test('GET /api/orders/:id/status - Fetch order status directly', async () => {
+      const res = await fetch(`${baseUrl}/api/orders/${testOrderId}/status`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.status !== 200) throw new Error(`Status ${res.status}`);
+      const json = await res.json();
+      if (json.status !== 'Pending') throw new Error(`Expected Pending, got ${json.status}`);
+    });
+
+    // 20. Update order status (supports lowercase 'shipped')
     await test('PATCH /api/orders/:id/status - Update order status to Shipped', async () => {
       const res = await fetch(`${baseUrl}/api/orders/${testOrderId}/status`, {
         method: 'PATCH',
@@ -259,11 +276,11 @@ async function runTests() {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ status: 'Shipped' }),
+        body: JSON.stringify({ status: 'shipped' }),
       });
       if (res.status !== 200) throw new Error(`Status ${res.status}`);
       const json = await res.json();
-      if (json.data.status !== 'Shipped') throw new Error('Status update mismatch');
+      if (json.status !== 'Shipped') throw new Error(`Expected Shipped, got ${json.status}`);
     });
 
   } finally {

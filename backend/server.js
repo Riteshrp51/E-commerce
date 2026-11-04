@@ -10,10 +10,20 @@ const startServer = async () => {
 
     // Auto-seed if database is empty
     const Product = require('./src/models/Product');
+    const User = require('./src/models/User');
     const { sampleProducts } = require('./src/seeders/seedProducts');
     const count = await Product.countDocuments();
     if (count === 0) {
       await Product.insertMany(sampleProducts);
+    }
+    const userCount = await User.countDocuments();
+    if (userCount === 0) {
+      const passwordHash = await User.hashPassword('password123');
+      await User.create({
+        name: 'Demo User',
+        email: 'demo@dailymart.com',
+        passwordHash,
+      });
     }
 
     const server = app.listen(PORT, '0.0.0.0', () => {

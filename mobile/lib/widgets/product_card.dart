@@ -28,6 +28,8 @@ class ProductCard extends StatelessWidget {
     final rating = 4.2 + ((product.name.hashCode.abs() % 8) / 10.0);
     final reviewCount = 18 + (product.name.hashCode.abs() % 75);
 
+    final isOutOfStock = !product.inStock || product.stock <= 0;
+
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(14),
@@ -81,12 +83,12 @@ class ProductCard extends StatelessWidget {
                     ),
                   ),
                 ),
-                if (!product.inStock)
+                if (isOutOfStock)
                   Positioned(
                     top: 6,
                     right: 6,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                       decoration: BoxDecoration(
                         color: Colors.black87,
                         borderRadius: BorderRadius.circular(4),
@@ -100,11 +102,31 @@ class ProductCard extends StatelessWidget {
                         ),
                       ),
                     ),
+                  )
+                else if (product.stock <= 10)
+                  Positioned(
+                    top: 6,
+                    right: 6,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: Colors.deepOrange.shade600,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(
+                        'Only ${product.stock} left',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 8.5,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
                   ),
               ],
             ),
 
-            // Product Information below image (compact, reduced space)
+            // Product Information below image
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(10, 6, 10, 8),
@@ -112,7 +134,7 @@ class ProductCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    // Category, Name, Yellow Star Reviews
+                    // Category, Name, Rating
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -138,7 +160,8 @@ class ProductCard extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 3),
-                        // Dummy Reviews in form of stars, filled with yellow
+
+                        // Star ratings
                         Row(
                           children: [
                             ...List.generate(5, (index) => const Icon(
@@ -160,22 +183,55 @@ class ProductCard extends StatelessWidget {
                       ],
                     ),
 
-                    // Price above, Add to Cart button below (tightly spaced)
+                    // Price + Stock count & Button
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          '₹${product.effectivePrice.toStringAsFixed(0)}',
-                          style: const TextStyle(
-                            fontSize: 14.5,
-                            fontWeight: FontWeight.w800,
-                            color: AppColors.textPrimary,
-                          ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              '₹${product.effectivePrice.toStringAsFixed(0)}',
+                              style: const TextStyle(
+                                fontSize: 14.5,
+                                fontWeight: FontWeight.w800,
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
+                            // Stock indicator
+                            if (isOutOfStock)
+                              const Text(
+                                'Out of stock',
+                                style: TextStyle(
+                                  fontSize: 9.5,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.error,
+                                ),
+                              )
+                            else if (product.stock <= 10)
+                              Text(
+                                '${product.stock} left',
+                                style: const TextStyle(
+                                  fontSize: 9.5,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.deepOrange,
+                                ),
+                              )
+                            else
+                              Text(
+                                '${product.stock} in stock',
+                                style: const TextStyle(
+                                  fontSize: 9.5,
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColors.textMuted,
+                                ),
+                              ),
+                          ],
                         ),
                         const SizedBox(height: 4),
 
-                        // Add to Cart Button
-                        if (!product.inStock)
+                        // Add to Cart Button / Counter
+                        if (isOutOfStock)
                           Container(
                             height: 30,
                             width: double.infinity,
@@ -200,6 +256,10 @@ class ProductCard extends StatelessWidget {
                             width: double.infinity,
                             child: ElevatedButton(
                               onPressed: () {
+                                if (product.stock <= 0) {
+                                  AppToast.error(context, 'This item is out of stock');
+                                  return;
+                                }
                                 HapticFeedback.lightImpact();
                                 cartProvider.addToCart(product, quantity: 1);
                                 AppToast.success(context, '${product.name} added to cart');
@@ -266,6 +326,10 @@ class ProductCard extends StatelessWidget {
                                 ),
                                 InkWell(
                                   onTap: () {
+                                    if (qty >= product.stock) {
+                                      AppToast.info(context, 'Only ${product.stock} units available in stock');
+                                      return;
+                                    }
                                     HapticFeedback.lightImpact();
                                     cartProvider.updateQuantity(product.id, qty + 1);
                                   },

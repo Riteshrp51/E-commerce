@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../core/constants/api_constants.dart';
 import '../models/user_model.dart';
 import '../services/auth_service.dart';
 
@@ -36,13 +37,28 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
+      await ApiConstants.resolveActiveBaseUrl();
       final res = await _authService.login(email: email, password: password);
       _user = res['user'];
       _isLoading = false;
       notifyListeners();
       return true;
     } catch (e) {
-      _errorMessage = e.toString();
+      final msg = e.toString();
+      if (msg.contains('reach the server') || msg.contains('timed out') || msg.contains('Network')) {
+        try {
+          await ApiConstants.resolveActiveBaseUrl(forceRefresh: true);
+          final res = await _authService.login(email: email, password: password);
+          _user = res['user'];
+          _isLoading = false;
+          notifyListeners();
+          return true;
+        } catch (retryErr) {
+          _errorMessage = retryErr.toString();
+        }
+      } else {
+        _errorMessage = msg;
+      }
       _isLoading = false;
       notifyListeners();
       return false;
@@ -59,6 +75,7 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
+      await ApiConstants.resolveActiveBaseUrl();
       final res = await _authService.register(
         name: name,
         email: email,
@@ -69,7 +86,25 @@ class AuthProvider extends ChangeNotifier {
       notifyListeners();
       return true;
     } catch (e) {
-      _errorMessage = e.toString();
+      final msg = e.toString();
+      if (msg.contains('reach the server') || msg.contains('timed out') || msg.contains('Network')) {
+        try {
+          await ApiConstants.resolveActiveBaseUrl(forceRefresh: true);
+          final res = await _authService.register(
+            name: name,
+            email: email,
+            password: password,
+          );
+          _user = res['user'];
+          _isLoading = false;
+          notifyListeners();
+          return true;
+        } catch (retryErr) {
+          _errorMessage = retryErr.toString();
+        }
+      } else {
+        _errorMessage = msg;
+      }
       _isLoading = false;
       notifyListeners();
       return false;

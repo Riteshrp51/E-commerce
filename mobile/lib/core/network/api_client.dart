@@ -37,6 +37,7 @@ class ApiClient {
     final headers = {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
+      'Bypass-Tunnel-Reminder': 'true',
     };
 
     final token = await getToken();

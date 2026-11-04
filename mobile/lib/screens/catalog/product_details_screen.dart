@@ -6,6 +6,7 @@ import '../../core/constants/app_colors.dart';
 import '../../core/utils/app_toast.dart';
 import '../../models/product_model.dart';
 import '../../providers/cart_provider.dart';
+import '../../providers/product_provider.dart';
 import '../../widgets/custom_button.dart';
 import '../cart/cart_screen.dart';
 
@@ -24,7 +25,11 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final product = widget.product;
+    final productProvider = Provider.of<ProductProvider>(context);
+    final product = productProvider.products.firstWhere(
+      (p) => p.id == widget.product.id,
+      orElse: () => widget.product,
+    );
     final cartProvider = Provider.of<CartProvider>(context);
     final inCart = cartProvider.isInCart(product.id);
 
@@ -178,19 +183,27 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
-                          color: product.inStock
-                              ? AppColors.success.withValues(alpha: 0.12)
-                              : AppColors.error.withValues(alpha: 0.12),
+                          color: !product.inStock || product.stock <= 0
+                              ? AppColors.error.withValues(alpha: 0.12)
+                              : product.stock <= 10
+                                  ? Colors.deepOrange.withValues(alpha: 0.12)
+                                  : AppColors.success.withValues(alpha: 0.12),
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
-                          product.inStock
-                              ? 'In Stock (${product.stock} units)'
-                              : 'Out of Stock',
+                          !product.inStock || product.stock <= 0
+                              ? 'Out of Stock'
+                              : product.stock <= 10
+                                  ? 'Only ${product.stock} units left!'
+                                  : 'In Stock (${product.stock} units)',
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.bold,
-                            color: product.inStock ? AppColors.success : AppColors.error,
+                            color: !product.inStock || product.stock <= 0
+                                ? AppColors.error
+                                : product.stock <= 10
+                                    ? Colors.deepOrange
+                                    : AppColors.success,
                           ),
                         ),
                       ),
@@ -316,7 +329,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
           child: Row(
             children: [
               // Quantity Counter (if in stock)
-              if (product.inStock) ...[
+              if (product.inStock && product.stock > 0) ...[
                 Container(
                   height: 48,
                   decoration: BoxDecoration(
@@ -344,7 +357,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                         icon: const Icon(Icons.add, size: 16),
                         onPressed: _selectedQuantity < product.stock
                             ? () => setState(() => _selectedQuantity++)
-                            : null,
+                            : () => AppToast.info(context, 'Maximum available stock reached'),
                       ),
                     ],
                   ),
@@ -355,15 +368,19 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
               // Add to Cart Button
               Expanded(
                 child: CustomButton(
-                  text: !product.inStock
+                  text: (!product.inStock || product.stock <= 0)
                       ? 'Out of Stock'
                       : inCart
                           ? 'Add More to Cart'
                           : 'Add to Cart',
                   icon: Icons.shopping_basket_outlined,
-                  onPressed: !product.inStock
+                  onPressed: (!product.inStock || product.stock <= 0)
                       ? null
                       : () async {
+                          if (_selectedQuantity > product.stock) {
+                            AppToast.error(context, 'Only ${product.stock} units available in stock');
+                            return;
+                          }
                           final ok = await cartProvider.addToCart(
                             product,
                             quantity: _selectedQuantity,
